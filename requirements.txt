@@ -111,5 +111,6 @@ tzdata==2022.7
 tzlocal==4.2
 urllib3==1.26.14
 validators==0.20.0
+watchdog==2.3.1
 yarl==1.8.2
 zipp==3.15.0

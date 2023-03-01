@@ -127,3 +127,17 @@ dmypy.json
 
 # Pyre type checker
 .pyre/.streamlit/
+
+
+# Streamlit stuff
+.streamlit
+.streamlit/
+/streamlit
+/.streamlit
+
+
+# Vs Code stuff
+.vscode
+.vscode/
+/vscode
+/.vscode
