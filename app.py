@@ -5,9 +5,17 @@ from langchain.embeddings import OpenAIEmbeddings
 from streamlit_extras import add_vertical_space as avs
 from langchain.vectorstores import Pinecone
 import pinecone
-from chain import chat_chain
+from chain import vector_chain, simple_seq_chain
 from config.config_files import APIkeys
 from dataclasses import asdict
+
+def build_history(history):
+    full_history = ""
+    for chat in history:
+        full_history += f"Question: {chat[0]} \n Answer: {chat[1]} \n\n"
+
+    print(full_history)
+    return full_history
 
 @st.cache_resource
 def init_vectorstore():
@@ -28,30 +36,47 @@ def App(userChoices):
     vectorstore = init_vectorstore()
     
     # load ChatVectorDBChain
-    chain = chat_chain(vectorstore, userChoices.temperature, userChoices.model, userChoices.domain, userChoices.usertitle)
+    if userChoices.domain != "General":
+        chain = vector_chain(vectorstore, userChoices.temperature, userChoices.model, userChoices.domain, userChoices.usertitle)
+    else:
+        chain = simple_seq_chain(userChoices.temperature, userChoices.model)
 
     def get_text():
         input_text = st.text_input("What's on your mind? ", key="input")
         return input_text
         
     user_input = get_text()
-
+    answer = ""
+    
     if user_input:
-        # run chain with user input and chat history
-        output = chain({"question": user_input, 
-                        "chat_history": st.session_state["chat_history"],
-                        "domain": userChoices.domain,
-                        "usertitle": userChoices.usertitle},
-                        return_only_outputs=False)
-        
+        if userChoices.domain != "General":
+            # run chain with user input and chat history
+            output = chain({"question": user_input, 
+                            "chat_history": st.session_state["chat_history"],
+                            "domain": userChoices.domain,
+                            "usertitle": userChoices.usertitle},
+                            return_only_outputs=False)
 
-        avs.add_vertical_space(5)
+            st.session_state.past.append(user_input)
+            answer = output['answer']
+            st.session_state["sources"]= output['source_documents']
+            
+
+        else:  
+            history_as_string = build_history(st.session_state['chat_history'])
+            output = chain({"question": user_input, "chat_history":  history_as_string})
+
+            answer = output["response"]
+            st.session_state["sources"]= []
+            st.write(answer)
+
+        st.session_state["chat_history"].append((user_input, answer))
         st.session_state.past.append(user_input)
-        st.session_state.generated.append(output['answer'])
+        st.session_state.generated.append(answer)
 
+    avs.add_vertical_space(5) 
     if st.session_state["generated"]:
-        st.session_state["chat_history"].append((user_input, output['answer']))
-        st.session_state["sources"]= output['source_documents']
+        print('here')
         for i in range(len(st.session_state["generated"]) - 1, -1, -1):
             message(st.session_state["generated"][i], key=str(i))
             message(st.session_state["past"][i], is_user=True, key=str(i) + "_user")
