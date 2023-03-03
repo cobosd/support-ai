@@ -3,11 +3,12 @@ import streamlit as st
 from streamlit_chat import message
 from langchain.embeddings import OpenAIEmbeddings
 from streamlit_extras import add_vertical_space as avs
-from langchain.vectorstores import Pinecone
+from langchain.vectorstores import Pinecone, Qdrant
 import pinecone
 from chain import vector_chain, simple_seq_chain
 from config.config_files import APIkeys
 from dataclasses import asdict
+from qdrant_client import QdrantClient
 
 def build_history(history):
     full_history = ""
@@ -21,11 +22,19 @@ def build_history(history):
 def init_vectorstore():
     """Initializes vectorstore"""
     print("Initializing vectorstore...")
-    pinecone.init(api_key=APIkeys.PineconeAPI, environment=APIkeys.PineconeEnv)
-    index = pinecone.Index(APIkeys.PineconeIdx)
+    # pinecone.init(api_key=APIkeys.PineconeAPI, environment=APIkeys.PineconeEnv)
+    # index = pinecone.Index(APIkeys.PineconeIdx)
     embeddings = OpenAIEmbeddings(openai_api_key=st.secrets['OPENAI_KEY'])
-    vectorstore = Pinecone(index, embeddings.embed_query, "text")
+    # vectorstore = Pinecone(index, embeddings.embed_query, "text")
     
+    
+    client = QdrantClient(
+    host="0a09d71f-4613-432e-b559-5c8ed3c24617.us-east-1-0.aws.cloud.qdrant.io", 
+    api_key="oXwue_DbXUWr505z-GnaGkqJTPzy1f34C1SZZk0vTtvHRMwlERJxfA",
+)
+    COLLECTION = "typing-agent-qdrant"
+    
+    vectorstore = Qdrant(client, COLLECTION, embeddings.embed_query, content_payload_key= 'text', metadata_payload_key='metadata')
     return vectorstore
 
 

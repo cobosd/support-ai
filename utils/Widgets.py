@@ -27,7 +27,7 @@ def widgets(column):
         with st.container():
             for index, item in enumerate(st.session_state['sources']):
                 with st.expander(f"{index + 1} — {item.metadata['title']}"):
-                    st.write(item.metadata['link'])
+                    st.write(item.metadata['url'])
                     st.write(item.page_content)
                 
     else:
