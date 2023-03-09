@@ -38,7 +38,7 @@ def vector_chain(_vectorstore, temperature,model,domain,usertitle):
     # 1. create standalone question based on current ser input
     # 2. load chat history documents
     # 3. combine standalone question, chat history, and vectorstore documents
-    chat = ChatVectorDBChain(vectorstore=_vectorstore, combine_docs_chain=doc_chain, question_generator=question_generator, return_source_documents=True)
+    chat = ChatVectorDBChain(vectorstore=_vectorstore, combine_docs_chain=doc_chain, question_generator=question_generator, top_k_docs_for_context=6,return_source_documents=True)
     
     return chat
 

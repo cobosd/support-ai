@@ -25,7 +25,7 @@ def sidebar():
         ('text-davinci-003', 'text-curie-001', 'text-babbage-001', 'text-ada-001'))
 
     temperature= st.slider('Temperature', min_value=0.00, max_value=1.00, value=0.00, format='%.2f')
-     
+    
     usertitle = st.radio(
         "What\'s your position?",
         ('District administrator', 'School administrator', 'Teacher', 'Student'))

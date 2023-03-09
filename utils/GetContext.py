@@ -22,8 +22,8 @@ def getContext(query, index, EMBED_MODEL, OPENAI_API):
         pinecone_result.append({
             'title': x['metadata']['title'],
             'text': x['metadata']['text'],
-             'url': x['metadata']['link'],
-             'score': x['score']
+            'url': x['metadata']['link'],
+            'score': x['score']
                 })
     
     return pinecone_result

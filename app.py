@@ -32,7 +32,7 @@ def init_vectorstore():
     host="0a09d71f-4613-432e-b559-5c8ed3c24617.us-east-1-0.aws.cloud.qdrant.io", 
     api_key="oXwue_DbXUWr505z-GnaGkqJTPzy1f34C1SZZk0vTtvHRMwlERJxfA",
 )
-    COLLECTION = "typing-agent-qdrant"
+    COLLECTION = "sjk-typing-agent"
     
     vectorstore = Qdrant(client, COLLECTION, embeddings.embed_query, content_payload_key= 'text', metadata_payload_key='metadata')
     return vectorstore
