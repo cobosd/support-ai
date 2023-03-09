@@ -10,6 +10,7 @@ from config.config_files import APIkeys
 from dataclasses import asdict
 from qdrant_client import QdrantClient
 
+
 def build_history(history):
     full_history = ""
     for chat in history:
@@ -17,6 +18,7 @@ def build_history(history):
 
     print(full_history)
     return full_history
+
 
 @st.cache_resource
 def init_vectorstore():
@@ -26,41 +28,42 @@ def init_vectorstore():
     # index = pinecone.Index(APIkeys.PineconeIdx)
     embeddings = OpenAIEmbeddings(openai_api_key=st.secrets['OPENAI_KEY'])
     # vectorstore = Pinecone(index, embeddings.embed_query, "text")
-    
-    
+
     client = QdrantClient(
-    host="0a09d71f-4613-432e-b559-5c8ed3c24617.us-east-1-0.aws.cloud.qdrant.io", 
-    api_key="oXwue_DbXUWr505z-GnaGkqJTPzy1f34C1SZZk0vTtvHRMwlERJxfA",
-)
+        host="0a09d71f-4613-432e-b559-5c8ed3c24617.us-east-1-0.aws.cloud.qdrant.io",
+        api_key="oXwue_DbXUWr505z-GnaGkqJTPzy1f34C1SZZk0vTtvHRMwlERJxfA",
+    )
     COLLECTION = "sjk-typing-agent"
-    
-    vectorstore = Qdrant(client, COLLECTION, embeddings.embed_query, content_payload_key= 'text', metadata_payload_key='metadata')
+
+    vectorstore = Qdrant(client, COLLECTION, embeddings.embed_query,
+                        content_payload_key='text', metadata_payload_key='metadata')
     return vectorstore
 
 
 def App(userChoices):
     print("Initializing app...")
-    
+
     # get vectorstore
     vectorstore = init_vectorstore()
-    
+
     # load ChatVectorDBChain
     if userChoices.domain != "General":
-        chain = vector_chain(vectorstore, userChoices.temperature, userChoices.model, userChoices.domain, userChoices.usertitle)
+        chain = vector_chain(vectorstore, userChoices.temperature,
+                            userChoices.model, userChoices.domain, userChoices.usertitle)
     else:
         chain = simple_seq_chain(userChoices.temperature, userChoices.model)
 
     def get_text():
         input_text = st.text_input("What's on your mind? ", key="input")
         return input_text
-        
+
     user_input = get_text()
     answer = ""
-    
+
     if user_input:
         if userChoices.domain != "General":
             # run chain with user input and chat history
-            output = chain({"question": user_input, 
+            output = chain({"question": user_input,
                             "chat_history": st.session_state["chat_history"],
                             "domain": userChoices.domain,
                             "usertitle": userChoices.usertitle},
@@ -68,24 +71,25 @@ def App(userChoices):
 
             st.session_state.past.append(user_input)
             answer = output['answer']
-            st.session_state["sources"]= output['source_documents']
-            
+            st.session_state["sources"] = output['source_documents']
 
-        else:  
+        else:
             history_as_string = build_history(st.session_state['chat_history'])
-            output = chain({"question": user_input, "chat_history":  history_as_string})
+            output = chain(
+                {"question": user_input, "chat_history":  history_as_string})
 
             answer = output["response"]
-            st.session_state["sources"]= []
+            st.session_state["sources"] = []
             st.write(answer)
 
         st.session_state["chat_history"].append((user_input, answer))
         st.session_state.past.append(user_input)
         st.session_state.generated.append(answer)
 
-    avs.add_vertical_space(5) 
+    avs.add_vertical_space(5)
     if st.session_state["generated"]:
         print('here')
         for i in range(len(st.session_state["generated"]) - 1, -1, -1):
             message(st.session_state["generated"][i], key=str(i))
-            message(st.session_state["past"][i], is_user=True, key=str(i) + "_user")
+            message(st.session_state["past"][i],
+                    is_user=True, key=str(i) + "_user")
