@@ -58,10 +58,14 @@ def simple_seq_chain(temperature):
     Standalone question:"""
     
     
-    query_template = """Provide a straight-forward answer to the question below. If you don't know the answer, just say that you don't know, don't try to make up an answer.
-
+    query_template = """Provide a straight-forward answer to the question at the end. Use the example below as a format for your answer. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    
+    Example:
+    Q: who is messi?
+    A: Messi is a professional soccer player from Argentina who currently plays for Paris Saint-Germain and is considered one of the greatest players of all time.
+    
     Question: {standalone_question}
-    Helpful answer:"""
+    Answer:"""
     
     
     
