@@ -51,7 +51,7 @@ def simple_seq_chain(temperature):
     print("Loading sequential conversation chain...")
     
     # Firs, get the standalone question
-    standalone_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
+    standalone_template = """Given the following conversation and a follow up question, rephrase the follow up questions.
     Chat History:
     {chat_history}
     Follow Up Input: {question}
