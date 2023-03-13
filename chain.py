@@ -74,15 +74,12 @@ def simple_seq_chain(temperature):
                 openai_api_key=APIkeys.OpenAiAPI, 
                 temperature=temperature, 
                 streaming=True, 
-                callback_manager=CallbackManager([StreamingCallbackHandler()]),
                 max_tokens=400)
     
     #Second, buil LLM to get answer based on standalone question
     streaming_llm_turbo = OpenAIChat(
             openai_api_key=APIkeys.OpenAiAPI, 
             temperature=temperature, 
-            streaming=True, 
-            callback_manager=CallbackManager([StreamingCallbackHandler()]),
             max_tokens=400)
     
         
@@ -104,7 +101,6 @@ def simple_seq_chain(temperature):
                                     input_variables=["chat_history", "question"],
                                     # Here we return multiple variables
                                     output_variables=["standalone_question", "response"],
-                                    callback_manager=CallbackManager([StreamingCallbackHandler()]),
                                     verbose=True)
     
     return overall_chain, standalone_chain
