@@ -104,6 +104,7 @@ def simple_seq_chain(temperature):
                                     input_variables=["chat_history", "question"],
                                     # Here we return multiple variables
                                     output_variables=["standalone_question", "response"],
+                                    callback_manager=CallbackManager([StreamingCallbackHandler()]),
                                     verbose=True)
     
     return overall_chain, standalone_chain
