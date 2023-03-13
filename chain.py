@@ -58,7 +58,7 @@ def simple_seq_chain(temperature):
     Standalone question:"""
     
     
-    query_template = """Provide a straight-forward answer to the question at the end. Use the example below as a format for your answer and provide any additional information to your response as you judge necessary. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    query_template = """Provide a straight-forward answer to the question at the end. Use the example below as a format for your answer and provide any additional relevant information to your response. If you don't know the answer, just say that you don't know, don't try to make up an answer.
     
     Example:
     Q: who is messi?
