@@ -51,14 +51,14 @@ def simple_seq_chain(temperature):
     print("Loading sequential conversation chain...")
     
     # Firs, get the standalone question
-    standalone_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question in passive voice.
+    standalone_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
     Chat History:
     {chat_history}
     Follow Up Input: {question}
     Standalone question:"""
     
     
-    query_template = """Provide an answer the following question. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    query_template = """Provide a straight-forward answer to the question below. If you don't know the answer, just say that you don't know, don't try to make up an answer.
 
     Question: {standalone_question}
     Helpful answer:"""
