@@ -1,71 +1,98 @@
-"""Callback Handler streams to stdout on new llm token."""
-import sys
-from typing import Any, Dict, List, Union
+"""Callback Handler that logs to streamlit."""
+from typing import Any, Dict, List, Optional, Union
+import streamlit as st
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.schema import AgentAction, AgentFinish, LLMResult
-import streamlit as st
+
 
 class StreamingCallbackHandler(BaseCallbackHandler):
-    """Callback handler for streaming. Only works with LLMs that support streaming."""
+    """Callback Handler that logs to streamlit."""
 
     def on_llm_start(
         self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any
     ) -> None:
-        """Run when LLM starts running."""
+        """Print out the prompts."""
+        # st.write("Prompts after formatting:")
+        # for prompt in prompts:
+        #     st.write(prompt)        
         self.result = None
         self.report = []
         self.res_box = st.empty()
         self.res_length = 0
-
+        
+        
     def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
-        """Run on new LLM token. Only available when streaming is enabled."""
-        # sys.stdout.write(token)
-        # sys.stdout.flush()    
+        """Do nothing."""
         self.report.append(token)
         self.result = "".join(self.report).strip()
         self.result = self.result.replace("\n", "")  
         self.res_box.markdown(f'*{self.result}*') 
+        pass
 
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
-        """Run when LLM ends running."""
+        """Do nothing."""
+        pass
 
     def on_llm_error(
         self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any
     ) -> None:
-        """Run when LLM errors."""
+        """Do nothing."""
+        pass
 
     def on_chain_start(
         self, serialized: Dict[str, Any], inputs: Dict[str, Any], **kwargs: Any
     ) -> None:
-        """Run when chain starts running."""
+        """Print out that we are entering a chain."""
+        class_name = serialized["name"]
+        st.write(f"Entering new {class_name} chain...")
 
     def on_chain_end(self, outputs: Dict[str, Any], **kwargs: Any) -> None:
-        """Run when chain ends running."""
+        """Print out that we finished a chain."""
+        st.write("Finished chain.")
 
     def on_chain_error(
         self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any
     ) -> None:
-        """Run when chain errors."""
+        """Do nothing."""
+        pass
 
     def on_tool_start(
-        self, serialized: Dict[str, Any], input_str: str, **kwargs: Any
+        self,
+        serialized: Dict[str, Any],
+        input_str: str,
+        **kwargs: Any,
     ) -> None:
-        """Run when tool starts running."""
+        """Print out the log in specified color."""
+        pass
 
     def on_agent_action(self, action: AgentAction, **kwargs: Any) -> Any:
         """Run on agent action."""
-        pass
+        # st.write requires two spaces before a newline to render it
+        st.markdown(action.log.replace("\n", "  \n"))
 
-    def on_tool_end(self, output: str, **kwargs: Any) -> None:
-        """Run when tool ends running."""
+    def on_tool_end(
+        self,
+        output: str,
+        observation_prefix: Optional[str] = None,
+        llm_prefix: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
+        """If not the final action, print out observation."""
+        st.write(f"{observation_prefix}{output}")
+        st.write(llm_prefix)
 
     def on_tool_error(
         self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any
     ) -> None:
-        """Run when tool errors."""
+        """Do nothing."""
+        pass
 
     def on_text(self, text: str, **kwargs: Any) -> None:
-        """Run on arbitrary text."""
+        """Run on text."""
+        # st.write requires two spaces before a newline to render it
+        st.write(text.replace("\n", "  \n"))
 
     def on_agent_finish(self, finish: AgentFinish, **kwargs: Any) -> None:
         """Run on agent end."""
+        # st.write requires two spaces before a newline to render it
+        st.write(finish.log.replace("\n", "  \n"))

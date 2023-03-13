@@ -1,6 +1,6 @@
 import streamlit as st
-from functions.getValues import getValues
-import numpy as np
+# from functions.getValues import getValues
+# import numpy as np
 
 
 def widgets(column):
@@ -26,7 +26,7 @@ def widgets(column):
         with st.container():
             for index, item in enumerate(st.session_state['sources']):
                 with st.expander(f"{index + 1} — {item.metadata['title']}"):
-                    st.write(item.metadata['url'])
+                    st.write(item.metadata['source'])
                     st.write(item.page_content)
 
     else:

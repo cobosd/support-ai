@@ -11,8 +11,8 @@ def UI():
     col1, col2  = st.columns([1, 1], gap='large')
     
     with st.sidebar:
-        temperature, usertitle, domain, model = sidebar()
-        userChoices = ModelParams(temperature=temperature, usertitle=usertitle, domain=domain, model=model)
+        temperature, domain = sidebar()
+        userChoices = ModelParams(temperature=temperature, domain=domain)
         
     with col1:
         App(userChoices)

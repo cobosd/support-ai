@@ -48,10 +48,9 @@ def App(userChoices):
 
     # load ChatVectorDBChain
     if userChoices.domain != "General":
-        chain = vector_chain(vectorstore, userChoices.temperature,
-                            userChoices.model, userChoices.domain, userChoices.usertitle)
+        vec_chain = vector_chain(vectorstore, userChoices.temperature)
     else:
-        chain = simple_seq_chain(userChoices.temperature, userChoices.model)
+        gen_chain, sq  = simple_seq_chain(userChoices.temperature)
 
     def get_text():
         input_text = st.text_input("What's on your mind? ", key="input")
@@ -63,10 +62,11 @@ def App(userChoices):
     if user_input:
         if userChoices.domain != "General":
             # run chain with user input and chat history
-            output = chain({"question": user_input,
+            output = vec_chain({"question": user_input,
                             "chat_history": st.session_state["chat_history"],
-                            "domain": userChoices.domain,
-                            "usertitle": userChoices.usertitle},
+                            # "domain": userChoices.domain,
+                            # "usertitle": userChoices.usertitle
+                            },
                             return_only_outputs=False)
 
             st.session_state.past.append(user_input)
@@ -74,8 +74,9 @@ def App(userChoices):
             st.session_state["sources"] = output['source_documents']
 
         else:
+            print(sq({'question': user_input, 'chat_history': st.session_state['chat_history']}))
             history_as_string = build_history(st.session_state['chat_history'])
-            output = chain(
+            output = gen_chain(
                 {"question": user_input, "chat_history":  history_as_string})
 
             answer = output["response"]
