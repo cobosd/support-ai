@@ -9,13 +9,16 @@ from langchain.chains.question_answering import load_qa_chain
 from config.config_files import APIkeys, ModelParams
 from langchain.prompts.prompt import PromptTemplate
 from langchain.chains import SequentialChain
+from langchain.chat_models import ChatOpenAI
 
 
 @st.cache_resource
-def vector_chain(_vectorstore, temperature):
+def vector_chain(_vectorstore, temperature, domain):
     """Contruct a chat chain to query vectorstore and return the answer. This already includes chat memory and streaming callback""" 
+    
     print("Loading vector db conversation chain...")
     
+    print(domain)
     # # initialize simple LLM chain
     # llm = OpenAI(temperature=0, openai_api_key=APIkeys.OpenAiAPI)
     # # prepare streamil LLM
@@ -27,7 +30,8 @@ def vector_chain(_vectorstore, temperature):
                             callback_manager=CallbackManager([StreamingCallbackHandler()]),
                             )
 
-    llm_turbo = OpenAIChat(openai_api_key=APIkeys.OpenAiAPI)
+    # llm_turbo = OpenAIChat(openai_api_key=APIkeys.OpenAiAPI)
+    llm_turbo = ChatOpenAI(openai_api_key=APIkeys.OpenAiAPI)
     
     # streaming_llm_turbo = OpenAIChat(temperature=0, 
     #                         openai_api_key=APIkeys.OpenAiAPI, 
@@ -46,9 +50,14 @@ def vector_chain(_vectorstore, temperature):
     
     return chat
 
+
+
 @st.cache_resource
-def simple_seq_chain(temperature):
+def simple_seq_chain(temperature, domain):
+    """Initialize is a chain for general purpose questions"""
+    
     print("Loading sequential conversation chain...")
+    print(domain)
     
     # Firs, get the standalone question
     standalone_template = """Given the following conversation and a follow up question, rephrase the follow up questions.
@@ -81,26 +90,23 @@ def simple_seq_chain(temperature):
             openai_api_key=APIkeys.OpenAiAPI, 
             temperature=temperature, 
             max_tokens=400)
+
+
     
-        
     standalone_prompt = PromptTemplate(input_variables=["chat_history", "question"], template=standalone_template)
     
+    
+    
     standalone_chain = LLMChain(llm=question_generator_llm_turbo, prompt=standalone_prompt, output_key="standalone_question")
- 
-    # streaming_llm = OpenAI(model_name=model, 
-    #         openai_api_key=APIkeys.OpenAiAPI, 
-    #         temperature=temperature, 
-    #         streaming=True, 
-    #         callback_manager=CallbackManager([StreamingCallbackHandler()]),
-    #         max_tokens=400)
+
     
 
     query_prompt = PromptTemplate(input_variables=["standalone_question"], template=query_template)
     response_chain = LLMChain(llm=streaming_llm_turbo, prompt=query_prompt, output_key="response")
+    
     overall_chain = SequentialChain(chains=[standalone_chain, response_chain], 
                                     input_variables=["chat_history", "question"],
-                                    # Here we return multiple variables
                                     output_variables=["standalone_question", "response"],
                                     verbose=True)
     
-    return overall_chain, standalone_chain
+    return overall_chain, standalone_chain, streaming_llm_turbo

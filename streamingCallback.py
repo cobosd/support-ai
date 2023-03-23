@@ -14,7 +14,7 @@ class StreamingCallbackHandler(BaseCallbackHandler):
         """Print out the prompts."""
         # st.write("Prompts after formatting:")
         # for prompt in prompts:
-        #     st.write(prompt)        
+        # st.write(prompt)        
         self.result = None
         self.report = []
         self.res_box = st.empty()
