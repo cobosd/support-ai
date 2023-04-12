@@ -10,10 +10,11 @@ from config.config_files import APIkeys
 
 
 @st.cache_resource
-def vector_chain(_vectorstore, temperature):
+def vector_chain(_vectorstore, temperature, domain):
     """Contruct a chat chain to query vectorstore and return the answer. This already includes chat memory and streaming callback""" 
     
-    print("Loading vector db conversation chain...")
+    print("Loading vector db conversation chain...", domain)
+    
     streaming_llm = OpenAI(temperature=temperature, 
                             openai_api_key=APIkeys.OpenAiAPI, 
                             verbose=True, 

@@ -19,15 +19,16 @@ def build_history(history):
     return full_history
 
 
-# @st.cache_resource
+@st.cache_resource
 def init_vectorstore(domain):
     """Initializes vectorstore"""
-    print("Initializing vectorstore...")
     
     collections = {
         "Yeti Academy": "sjk-yeti-academy",
         "Typing Agent": "sjk-typing-agent",
     }
+    
+    print("Initializing vectorstore...", domain)
     
     embeddings = OpenAIEmbeddings(openai_api_key=st.secrets['OPENAI_KEY'])
 
@@ -47,7 +48,7 @@ def App(userChoices):
     if userChoices.domain != "General":
         # get vectorstore
         vectorstore = init_vectorstore(domain=userChoices.domain)
-        vec_chain = vector_chain(vectorstore, userChoices.temperature)
+        vec_chain = vector_chain(vectorstore, userChoices.temperature, userChoices.domain)
     # else:
     #     gen_chain, standalone_creator, streaming_llm_turbo  = simple_seq_chain(userChoices.temperature, domain=userChoices.domain)
 
