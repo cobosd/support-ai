@@ -1,5 +1,4 @@
 import streamlit as st
-from config.config_files import ModelParams
 
 def sidebar():
     
@@ -26,13 +25,14 @@ def sidebar():
 
     temperature = st.slider('Temperature', min_value=0.00, max_value=1.00, value=0.00, format='%.2f')
     
+    
     # usertitle = st.radio(
     #     "What\'s your position?",
     #     ('District administrator', 'School administrator', 'Teacher', 'Student'))
     
     domain = st.radio(
         "What\'s your question about?",
-        ('Typing Agent', 'Yeti Academy', 'General'))
+        ('Typing Agent', 'Yeti Academy'),on_change=st.session_state.clear)
 
-
+    
     return temperature, domain

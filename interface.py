@@ -4,7 +4,6 @@ from utils.Sidebar import sidebar
 from utils.Widgets import widgets
 from app import App
 from config.config_files import ModelParams
-from dataclasses import asdict
     
             
 def UI():
